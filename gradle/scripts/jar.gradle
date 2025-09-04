@@ -1,0 +1,28 @@
+tasks.named("jar") {
+  manifest {
+    attributes(
+      "Main-Class": "com.example.demo.DemoApplication",
+      'Build-JDK': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
+      'Build-OS': "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}",
+      'Built-By': System.properties['user.name'],
+      'Created-By': "Gradle ${gradle.gradleVersion}",
+      'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+      'Implementation-Version': project.version,
+      "Implementation-Title": project.name
+    )
+  }
+}
+
+tasks.named("bootJar") {
+  manifest {
+    attributes(
+      'Build-JDK': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
+      'Build-OS': "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}",
+      'Built-By': System.properties['user.name'],
+      'Created-By': "Gradle ${gradle.gradleVersion}",
+      'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+      'Implementation-Version': project.version,
+      "Implementation-Title": project.name
+    )
+  }
+}

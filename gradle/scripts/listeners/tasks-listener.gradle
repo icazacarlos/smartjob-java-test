@@ -1,0 +1,11 @@
+gradle.taskGraph.beforeTask { task ->
+  logger.lifecycle("Starting task: ${task.path}")
+}
+
+gradle.taskGraph.afterTask { task ->
+  logger.lifecycle("Finished task: ${task.path} with result: ${task.state.outcome}")
+}
+
+gradle.taskGraph.whenReady {
+  logger.lifecycle('=== initialized in taskGraph.whenReady')
+}

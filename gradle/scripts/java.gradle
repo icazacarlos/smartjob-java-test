@@ -1,0 +1,40 @@
+java {
+  sourceCompatibility = JavaVersion.VERSION_21
+  targetCompatibility = JavaVersion.VERSION_21
+
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
+
+  withJavadocJar()
+  withSourcesJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+  options.encoding = "UTF-8"
+}
+
+tasks.withType(Javadoc).configureEach {
+  options {
+    addBooleanOption("html5", true)
+    addBooleanOption("Xdoclint:none", true)
+    addStringOption("charset",  "UTF-8")
+    addStringOption("docencoding", "UTF-8")
+    addStringOption("encoding", "UTF-8")
+    
+    docTitle = "My Project API doc"
+    overview = "kdcvkdv"
+    windowTitle = "My Project API 2.0"
+  }
+
+  title = "My Project API"
+
+  /*
+  include "com/example/mypackage/**" // Includes specific packages
+  exclude "com/example/testpackage/**" // Excludes specific packages
+  */
+}
+
+tasks.withType(JavaExec).configureEach {
+  jvmArgs += ["-Xms512m", "-Xmx1g"]
+}

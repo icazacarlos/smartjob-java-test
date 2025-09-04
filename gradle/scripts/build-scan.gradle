@@ -1,0 +1,42 @@
+import groovy.json.JsonOutput
+
+def buildScanInfoFile = layout.buildDirectory.file("reports/buildscan/buildscan.json").get().asFile
+
+develocity {
+  projectId = "myProject"
+  buildScan {
+    //uploadInBackground = false
+    
+    termsOfUseUrl = "https://gradle.com/help/legal-terms-of-use"
+    termsOfUseAgree = "yes"
+
+    link "git repository", "https://github.com/myorg/sample/tree/"
+
+    /*
+    value "Build Number", project.name
+    value "Number", project.name
+    tag System.getProperty("os.name")
+    */
+
+    capture {
+      /*
+      buildLogging = false
+      testLogging = false
+      fileFingerprints = false
+      resourceUsage = false
+      */
+    }
+
+    buildScanPublished { scan ->
+      buildScanInfoFile.parentFile.mkdirs()
+      def payload = [
+        scan: [
+          id: scan.buildScanId,
+          uri: scan.buildScanUri.toString()
+        ]]
+
+      def json = JsonOutput.prettyPrint(JsonOutput.toJson(payload))
+      buildScanInfoFile.withWriter('UTF-8') { it << json }
+    }
+  }
+}

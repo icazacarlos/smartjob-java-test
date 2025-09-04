@@ -1,0 +1,39 @@
+services:
+  mysql:
+    image: mysql:9.0
+    container_name: bci-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: bci
+      MYSQL_USER: bci
+      MYSQL_PASSWORD: bci_pass
+      MYSQL_ROOT_PASSWORD: root_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - bci-mysql-data:/var/lib/mysql
+
+  app:
+    build:
+      context: .
+    container_name: bci-user-api
+    depends_on:
+      - mysql
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: bci
+      DB_USER: bci
+      DB_PASSWORD: bci_pass
+      JAVA_OPTS: "-Xms256m -Xmx512m"
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/api/v1/users/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  bci-mysql-data:
+    driver: local

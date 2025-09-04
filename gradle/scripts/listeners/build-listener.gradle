@@ -1,0 +1,11 @@
+gradle.buildFinished {
+  logger.lifecycle('=== initialized in buildFinished')
+}
+
+gradle.projectsEvaluated {
+  logger.lifecycle('=== initialized in projectsEvaluated')
+}
+
+gradle.projectsLoaded {
+  logger.lifecycle('=== initialized in projectsLoaded')
+}

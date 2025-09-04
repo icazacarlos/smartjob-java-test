@@ -1,0 +1,25 @@
+spotbugs {
+  //effort = "max"
+  //reportLevel = "medium"
+  showStackTraces = true
+  showProgress = true
+  ignoreFailures = true
+  includeFilter = file("${project.rootDir}/gradle/tools/spotbugs/include.xml")
+  excludeFilter = file("${project.rootDir}/gradle/tools/spotbugs/exclude.xml")
+  onlyAnalyze = ['com.foobar.MyClass', 'com.foobar.mypkg.*']
+  maxHeapSize = '1g'
+}
+
+spotbugsMain {
+  reports {
+    html.enabled = true
+    xml.enabled = false
+  }
+}
+
+spotbugsTest {
+  reports {
+    html.enabled = true
+    xml.enabled = false
+  }
+}

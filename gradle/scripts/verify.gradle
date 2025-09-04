@@ -1,0 +1,67 @@
+import groovy.json.JsonSlurper
+
+// Allow overriding the SARIF path: -PsarifReport=path/to/report.sarif
+def sarifReport = providers
+  .gradleProperty('sarifReport')
+  .map { layout.projectDirectory.file(it) } // Provider<RegularFile>
+  .orElse(layout.buildDirectory.file('reports/hadolint/hadolint.sarif'))
+
+// If a producer exists, depend on it (keeps this task lazy)
+def producers = ['hadolint', 'hadolintDocker'].findAll { tasks.findByName(it) != null }
+
+tasks.register('verifySarifNoFindings') {
+  group = "Verification"
+  description = 'Fail if any SARIF run contains results (findings)'
+
+  // Wire to producer(s) if available
+  dependsOn(producers)
+
+  // Lazy inputs: resolved only when the task runs
+  inputs.files(providers.provider {
+    File candidate = sarifReport.get().asFile
+    if (candidate.exists()) {
+      files(candidate)
+    } else {
+      // Fallback: scan repo for SARIF files (still resolved lazily)
+      fileTree(project.rootDir) {
+        include '**/*.sarif', '**/*.sarif.json'
+        exclude '**/.gradle/**', '**/build/tmp/**'
+      }
+    }
+  }).withPropertyName('sarifFiles')
+
+  doLast {
+    def filesToCheck = inputs.files.files
+    if (filesToCheck.empty) {
+      logger.lifecycle('verifySarifNoFindings: no SARIF files found — skipping.')
+      return
+    }
+
+    def slurper = new JsonSlurper()
+    int totalFindings = 0
+    List<String> details = []
+
+    filesToCheck.each { File f ->
+      def json = slurper.parse(f)
+      def runs = (json?.runs ?: [])
+      runs.eachWithIndex { run, idx ->
+        def results = (run?.results ?: [])
+        totalFindings += results.size()
+        results.each { r ->
+          def rule = r?.ruleId ?: r?.rule?.id ?: 'UNKNOWN'
+          def msg  = r?.message?.text ?: ''
+          details << "${f.name} [run #${idx}] ${rule}: ${msg}"
+        }
+      }
+    }
+
+    if (totalFindings > 0) {
+      def preview = details.take(20).collect { " - $it" }.join('\n')
+      throw new GradleException(
+        "SARIF verification failed: ${totalFindings} finding(s) detected.\n${preview}${details.size()>20?'\n...(more findings omitted)':''}"
+      )
+    } else {
+      logger.lifecycle("SARIF verification: no findings ✅")
+    }
+  }
+}

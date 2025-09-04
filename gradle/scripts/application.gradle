@@ -1,0 +1,10 @@
+application {
+  mainClass = "org.example.App"
+  applicationDefaultJvmArgs = [
+    "-Xms512m",
+    "-Xmx1g",
+    "-splash:splash/splash.png",
+    "-showversion",
+    "-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
+    ]
+}

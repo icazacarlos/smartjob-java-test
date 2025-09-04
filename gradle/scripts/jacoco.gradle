@@ -1,0 +1,22 @@
+tasks.register("jacocoTestReport", JacocoReport) {
+  group = "Reporting"
+  description = "Generates JaCoCo coverage (XML/HTML) for tests."
+
+  executionData.setFrom(fileTree(buildDir).include(
+    "jacoco/test.exec",
+    "jacoco/*.exec",
+    // Gradle 8 may write .exec next to the task; include standard patterns:
+    "outputs/unit_test_code_coverage/*.exec")
+  )
+
+  sourceDirectories.setFrom(files("src/main/java"))
+  classDirectories.setFrom(fileTree("${buildDir}/classes/java/main"))
+
+  reports {
+    xml.required = true         // <— REQUIRED for Sonar
+    html.required = true        // optional, nice to have
+    csv.required = false
+    // xml.outputLocation can be customized; default below is fine:
+    // xml.outputLocation = layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml")
+  }
+}

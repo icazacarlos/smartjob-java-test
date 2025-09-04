@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="5">
+  <!-- Tune the async ring buffer for more throughput -->
+  <Properties>
+    <!-- 262144 = 256k; increase if you drop events -->
+    <Property name="AsyncLogger.RingBufferSize">262144</Property>
+    <!-- Avoid immediate flush for throughput; set true to stress fsyncs -->
+    <Property name="immediateFlush">false</Property>
+    <!-- Log directory -->
+    <Property name="logDir">C:/Users/cicaza/opt/consultec/academia/repositories/virtual-threads-bench/logs</Property>
+    <Property name="fileName">${logDir}/app.log</Property>
+    <Property name="filePattern">${logDir}/app-%d{yyyy-MM-dd}-%i.log.gz</Property>
+  </Properties>
+
+  <Appenders>
+    <!-- Fast file appender using random access + rolling by size -->
+    <RollingRandomAccessFile name="FILE"
+      fileName="${fileName}"
+      filePattern="${filePattern}"
+      immediateFlush="${immediateFlush}">
+      <!-- Include thread id (%tid) if your Log4j2 version supports it; otherwise omit -->
+      <PatternLayout pattern="%d{ISO8601} %-5level [%tid:%t] %logger{36} - %msg%n" />
+      <Policies>
+        <SizeBasedTriggeringPolicy size="100 MB" />
+        <!-- You can add a TimeBasedTriggeringPolicy if you want time rollovers too -->
+      </Policies>
+      <DefaultRolloverStrategy max="50" />
+      <!-- Use buffered I/O (default true) for throughput -->
+    </RollingRandomAccessFile>
+
+    <!-- Optional: console for quick visibility -->
+    <Console name="CONSOLE" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level [%t] %logger{36} - %msg%n" />
+    </Console>
+  </Appenders>
+
+  <!-- With AsyncLoggerContextSelector, all loggers are async automatically -->
+  <Loggers>
+        <!-- Enable DEBUG only for your app code -->
+    <Logger name="org.example" level="debug" additivity="false">
+        <AppenderRef ref="FILE"/>
+    </Logger>
+
+    <Root level="info">
+      <AppenderRef ref="FILE" />
+      <!-- <AppenderRef ref="CONSOLE"/> -->
+    </Root>
+  </Loggers>
+</Configuration>

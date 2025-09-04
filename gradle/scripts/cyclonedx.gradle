@@ -1,0 +1,5 @@
+cyclonedxBom {
+  projectType = "application"
+  destination = file("build/reports/sbom")
+  outputName = "sbom"
+}

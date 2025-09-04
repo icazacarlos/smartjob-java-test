@@ -1,0 +1,44 @@
+checkstyle {
+  toolVersion = "10.12.4" //"10.3.2" //${checkstyleToolVersion}"
+  configFile = file("${project.rootDir}/gradle/tools/checkstyle/config.xml")
+  maxWarnings = 0
+  ignoreFailures = true
+}
+
+checkstyleMain {
+  reports {
+    html.required = true
+    sarif.required = true
+    xml.required = true
+    xml.outputLocation = layout.buildDirectory.file("reports/checkstyle/main.xml")
+    showViolations = true
+  }
+}
+
+checkstyleTest {
+  reports {
+    html.required = false
+    xml.required = true
+    xml.outputLocation = layout.buildDirectory.file("reports/checkstyle/test.xml")
+    showViolations = true
+  }
+}
+
+tasks.withType(Checkstyle) {
+  minHeapSize = "512m"
+  maxHeapSize = "1g"
+}
+
+checkstyleMain.source = "src/main/java"
+checkstyleTest.source = "src/test/java"
+
+
+tasks.named("checkstyleMain").configure {
+  group = "Verification"
+  description = "Run Checkstyle analysis for main classes"
+}
+
+tasks.named("checkstyleTest").configure {
+  group = "Verification"
+  description = "Run Checkstyle analysis for test classes"
+}

@@ -1,0 +1,75 @@
+def hadolintCmd = "hadolint"
+def sarifOut = layout.buildDirectory.file("reports/hadolint/hadolint.sarif")
+
+def containerfiles = files(
+  layout.projectDirectory.file("Dockerfile"),
+  layout.projectDirectory.file("Containerfile")
+).filter { it.exists() }
+
+def execOps = project.extensions.findByType(ExecOperations)
+
+if (!execOps) {
+  execOps = project.services.get(ExecOperations)
+}
+
+def hasHadolint = { String cmd ->
+  try {
+    def result = execOps.exec {
+      commandLine cmd, '--version'
+      ignoreExitValue = true
+      standardOutput = new ByteArrayOutputStream()
+      errorOutput = new ByteArrayOutputStream()
+    }
+    result.exitValue == 0
+  } catch (Throwable exception) {
+    false
+  }
+}
+
+tasks.register("hadolint", Exec) { t ->
+  group = "Verification"
+  description = 'Run hadolint on Dockerfile or Containerfile'
+
+  inputs.files(containerfiles)
+    .withPropertyName('containerfiles')
+
+  outputs.file(sarifOut)
+
+  onlyIf {
+    !containerfiles.files.empty
+  }
+
+  doFirst {
+    if (!hasHadolint(hadolintCmd)) {
+      logger.error("${hadolintCmd}: command not found")
+      throw new GradleException("Skipping hadolint task: ${hadolintCmd} not found.")
+    }
+
+    sarifOut.get().asFile.parentFile.mkdirs()
+    t.ext.outputStream = new ByteArrayOutputStream()
+    standardOutput = t.outputStream
+  }
+
+  executable = hadolintCmd
+  args = [
+    '--format', 'sarif',
+    '--no-color',
+    '--failure-threshold', 'error',
+    '--no-fail'
+  ]
+  //args += ["--verbose"]
+  args += containerfiles.files.collect { "\"${it.path}\"" }
+
+  doLast {
+    def exitCode = executionResult.get().exitValue
+    logger.info("Hadolint exit code: ${exitCode}")
+    if (exitCode == 127) {
+      logger.error("Hadolint command not found: '${hadolintCmd}'")
+      return
+    }
+    def outFile = sarifOut.get().asFile
+    outFile.parentFile.mkdirs()
+    outFile.text = t.outputStream.toString("UTF-8")
+    logger.info("Hadolint SARIF report saved to ${outFile}")
+  }
+}

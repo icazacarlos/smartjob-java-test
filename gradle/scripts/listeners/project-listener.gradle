@@ -1,0 +1,7 @@
+gradle.beforeProject { project ->
+  logger.lifecycle('=== initialized in beforeProject')
+}
+
+gradle.afterProject { project ->
+  logger.lifecycle('=== initialized in afterProject')
+}

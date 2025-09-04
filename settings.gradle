@@ -1,0 +1,28 @@
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+    mavenCentral()
+  }
+  resolutionStrategy {
+    logger.info("Resolving plugins...")
+    eachPlugin {
+      logger.info("Requested: ${requested.id}" + 
+        (requested.version == null ? "" : " -> version ${requested.version}"))
+    }
+  }
+}
+
+plugins {
+  id "org.gradle.toolchains.foojay-resolver-convention" version "0.10.0"
+  id "com.gradle.develocity" version "3.19.2"
+}
+
+rootProject.name = 'bci-user-api'
+
+dependencyResolutionManagement {
+  repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+}

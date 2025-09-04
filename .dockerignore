@@ -1,0 +1,15 @@
+.classpath
+.env
+.git
+.gitattributes
+.gitignore
+.gradle
+.project
+.properties
+.settings
+.vscode
+bin
+build
+config
+docker-compose.yml
+README.md

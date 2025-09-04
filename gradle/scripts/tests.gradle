@@ -1,0 +1,7 @@
+tasks.withType(Test) {
+  systemProperty "file.encoding", "UTF-8"
+}
+
+tasks.named("test") {
+  useJUnitPlatform()
+}

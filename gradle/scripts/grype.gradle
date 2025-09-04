@@ -1,0 +1,68 @@
+def grypeCmd   = "grype"
+def sbomFile   = layout.buildDirectory.file('reports/sbom/sbom.json').get().asFile
+def sarifOut   = layout.buildDirectory.file('reports/grype/grype.sarif')
+
+def execOps = project.extensions.findByType(ExecOperations)
+
+if (!execOps) {
+  execOps = project.services.get(ExecOperations)
+}
+
+def hasGrype = { String cmd ->
+  try {
+    def result = execOps.exec {
+      commandLine cmd, '--version'
+      ignoreExitValue = true
+      standardOutput = new ByteArrayOutputStream()
+      errorOutput = new ByteArrayOutputStream()
+    }
+    result.exitValue == 0
+  } catch (Throwable exception) {
+    false
+  }
+}
+
+tasks.register('grype', Exec) { t ->
+  group = "Verification"
+  description = 'Run grype on local SBOM and generate SARIF report'
+
+  inputs.file(sbomFile)
+    .withPropertyName('sbom')
+
+  outputs.file(sarifOut)
+
+  onlyIf {
+    sbomFile.exists()
+  }
+
+  doFirst {
+    if (!hasGrype(grypeCmd)) {
+      logger.error("${grypeCmd}: command not found")
+      throw new GradleException("Skipping grype task: ${grypeCmd} not found.")
+    }
+
+    sarifOut.get().asFile.parentFile.mkdirs()
+    t.ext.outputStream = new ByteArrayOutputStream()
+    standardOutput = t.outputStream
+  }
+
+  executable = grypeCmd
+  args = [
+    "sbom:${sbomFile.absolutePath}",
+    "--output", "sarif",
+    "--fail-on", "critical"
+  ]
+  //args += ["--verbose"]
+
+  doLast {
+    def exitCode = executionResult.get().exitValue
+    if (exitCode != 0) {
+      logger.info("grype exit code: ${exitCode}")
+    }
+
+    def outFile = sarifOut.get().asFile
+    outFile.parentFile.mkdirs()
+    outFile.text = t.outputStream.toString("UTF-8")
+    logger.info("grype SARIF report saved to ${outFile}")
+  }
+}

@@ -1,0 +1,62 @@
+plugins {
+  id 'java'
+  id 'org.springframework.boot' version '3.5.5'
+  id 'io.spring.dependency-management' version '1.1.7'
+
+  id "com.github.spotbugs" version "6.2.6"
+  id "checkstyle"
+  id "org.sonarqube" version "6.3.1.5724"
+  id "org.cyclonedx.bom" version "2.3.1"
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+description = 'Demo project for Spring Boot'
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
+}
+
+configurations {
+  all {
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+  }
+
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
+}
+
+dependencies {
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+  implementation 'org.springframework.boot:spring-boot-starter-undertow'
+  implementation 'org.springframework.boot:spring-boot-starter-validation'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+  compileOnly 'org.projectlombok:lombok'
+  runtimeOnly 'com.h2database:h2'
+
+  annotationProcessor 'org.projectlombok:lombok'
+  developmentOnly 'org.springframework.boot:spring-boot-devtools'
+}
+
+fileTree(rootProject.file("gradle/scripts"))
+  .matching {
+    include "**/*.gradle"
+    exclude "listeners/**",
+      "grype.gradle",
+      "hadolint.gradle",
+      "application.gradle"
+  }
+  .files.sort().each {
+    apply from: it
+    logger.info("Applied gradle script: ${it}")
+  }
