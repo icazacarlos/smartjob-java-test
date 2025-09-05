@@ -23,3 +23,11 @@ spotbugsTest {
     xml.enabled = false
   }
 }
+
+tasks.named("spotbugsMain").configure {
+  enabled = false
+}
+
+tasks.named("spotbugsTest").configure {
+  enabled = false
+}

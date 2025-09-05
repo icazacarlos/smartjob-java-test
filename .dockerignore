@@ -8,6 +8,9 @@
 .properties
 .settings
 .vscode
+**/*javadoc.jar
+**/*plain.jar
+**/*source.jar
 bin
 build
 config

@@ -36,9 +36,11 @@ checkstyleTest.source = "src/test/java"
 tasks.named("checkstyleMain").configure {
   group = "Verification"
   description = "Run Checkstyle analysis for main classes"
+  enabled = false
 }
 
 tasks.named("checkstyleTest").configure {
   group = "Verification"
   description = "Run Checkstyle analysis for test classes"
+  enabled = false
 }

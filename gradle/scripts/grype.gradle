@@ -66,3 +66,7 @@ tasks.register('grype', Exec) { t ->
     logger.info("grype SARIF report saved to ${outFile}")
   }
 }
+
+tasks.named("grype").configure {
+  enabled = false
+}

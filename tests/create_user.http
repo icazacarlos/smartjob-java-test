@@ -1,0 +1,17 @@
+POST /api/users/create HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+Content-Length: 241
+
+{
+    "name": "Juan Rodriguez",
+    "email": "juan@smartjob.cl",
+    "password": "abC12345$",
+    "phones": [
+        {
+            "number": "1234567",
+            "citycode": "1",
+            "contrycode": "57"
+        }
+    ]
+}

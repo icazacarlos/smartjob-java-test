@@ -1,25 +1,19 @@
-/** 
- * This file is used to define task dependencies and execution order.
- * It ensures that tasks are executed in the correct sequence to maintain
- * the integrity of the build process.
- */
-
 tasks.named("build").configure {
   mustRunAfter("clean")
 }
 
 tasks.named("check").configure {
-  //dependsOn("hadolint")
-  //dependsOn("grype")
+  dependsOn("hadolint")
+  dependsOn("grype")
   dependsOn("sonar")
-}
-
-tasks.named("jacocoTestReport").configure {
-  dependsOn(tasks.test)
 }
 
 tasks.named("jar").configure {
   dependsOn "check"
+}
+
+tasks.named("test").configure {
+  finalizedBy "jacocoTestReport"
 }
 
 tasks.named("sonar").configure {
@@ -27,9 +21,3 @@ tasks.named("sonar").configure {
   dependsOn("checkstyleMain", "checkstyleTest")
   dependsOn("spotbugsMain", "spotbugsTest")
 }
-
-/*
-tasks.named("grype") {
-  dependsOn("cyclonedxBom")
-}
-*/

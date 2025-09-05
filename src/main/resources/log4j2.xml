@@ -7,7 +7,7 @@
   </Appenders>
 
   <Loggers>
-    <Logger name="org.example" level="info" additivity="false">
+    <Logger name="cl.smartjob.example.service.user" level="debug" additivity="false">
       <AppenderRef ref="CONSOLE" />
     </Logger>
     <Root level="info">

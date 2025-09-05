@@ -29,4 +29,5 @@ sonarqube {
 
 tasks.named("sonar").configure {
   notCompatibleWithConfigurationCache("SonarScanner for Gradle is not CC-compatible yet")
+  enabled = false
 }

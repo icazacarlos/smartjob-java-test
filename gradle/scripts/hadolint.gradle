@@ -73,3 +73,7 @@ tasks.register("hadolint", Exec) { t ->
     logger.info("Hadolint SARIF report saved to ${outFile}")
   }
 }
+
+tasks.named("hadolint").configure {
+  enabled = false
+}

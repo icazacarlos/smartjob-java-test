@@ -2,9 +2,11 @@ java {
   sourceCompatibility = JavaVersion.VERSION_21
   targetCompatibility = JavaVersion.VERSION_21
 
+  /*
   toolchain {
     languageVersion = JavaLanguageVersion.of(21)
   }
+  */
 
   withJavadocJar()
   withSourcesJar()
@@ -33,8 +35,17 @@ tasks.withType(Javadoc).configureEach {
   include "com/example/mypackage/**" // Includes specific packages
   exclude "com/example/testpackage/**" // Excludes specific packages
   */
+  enabled = false
 }
 
 tasks.withType(JavaExec).configureEach {
   jvmArgs += ["-Xms512m", "-Xmx1g"]
 }
+
+/*
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
+}
+*/
